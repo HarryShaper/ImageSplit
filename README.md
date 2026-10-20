@@ -77,3 +77,18 @@ checksum to GitHub Releases, then link that release from the website.
 
 To uninstall, remove the three ImageSplit paths listed above using administrator
 permissions. Your photos and per-user log files remain untouched.
+
+## Enable the Finder Quick Action
+
+After installing ImageSplit:
+
+1. Right-click a folder in Finder.
+2. Choose Quick Actions → Customize.
+3. Enable Split RAW-JPEG.
+
+Select one or more folders, then choose
+Quick Actions → Split RAW-JPEG to sort their images.
+
+The current installer has been tested on an Apple Silicon Mac
+running macOS 15.7.4. It is an unsigned prototype; signing,
+notarization, and testing on another Mac remain outstanding.
