@@ -116,6 +116,8 @@ def main():
                 parser.error(f'Runtime symlink escapes its directory: {entry}')
         shutil.copytree(runtime, app / 'runtime', symlinks=True)
         shutil.copy2(ROOT / 'image_split.py', app / 'image_split.py')
+        shutil.copytree(ROOT / 'packaging/runtime-licenses' / args.arch,
+                        app / 'runtime/licenses')
         runtime_details = inspect_runtime(app / 'runtime/bin/python3', args.arch)
         # Test from the relocated runtime rather than the original path.
         subprocess.run([str(app / 'runtime/bin/python3'), '-I', '-c',
