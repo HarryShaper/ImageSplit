@@ -41,15 +41,7 @@ def workflow():
             'isViewVisible': True,
         }],
         'connectors': [],
-        'workflowMetaData': {
-            'serviceInputTypeIdentifier': 'com.apple.Automator.fileSystemObject.folder',
-            'serviceOutputTypeIdentifier': 'com.apple.Automator.nothing',
-            'serviceProcessesInput': 0,
-            'serviceApplicationBundleID': 'com.apple.finder',
-            'serviceApplicationPath': '/System/Library/CoreServices/Finder.app',
-            'serviceApplicationName': 'Finder',
-            'workflowTypeIdentifier': 'com.apple.Automator.servicesMenu',
-        },
+        'workflowMetaData': {'applicationBundleID': 'com.apple.finder', 'applicationBundleIDsByPath': {'/System/Library/CoreServices/Finder.app': 'com.apple.finder'}, 'applicationPath': '/System/Library/CoreServices/Finder.app', 'applicationPaths': ['/System/Library/CoreServices/Finder.app'], 'inputTypeIdentifier': 'com.apple.Automator.fileSystemObject.folder', 'outputTypeIdentifier': 'com.apple.Automator.nothing', 'presentationMode': 15, 'processesInput': False, 'serviceApplicationBundleID': 'com.apple.finder', 'serviceApplicationPath': '/System/Library/CoreServices/Finder.app', 'serviceInputTypeIdentifier': 'com.apple.Automator.fileSystemObject.folder', 'serviceOutputTypeIdentifier': 'com.apple.Automator.nothing', 'serviceProcessesInput': False, 'systemImageName': 'NSActionTemplate', 'useAutomaticInputType': False, 'workflowTypeIdentifier': 'com.apple.Automator.servicesMenu'},
     }
 
 
@@ -93,8 +85,10 @@ def main():
         (contents / 'document.wflow').write_bytes(plistlib.dumps(workflow()))
         info = {'CFBundleIdentifier': 'io.github.harryshaper.imagesplit.quickaction',
                 'CFBundleName': 'Split RAW-JPEG', 'CFBundleVersion': args.version,
-                'NSServices': [{'NSMenuItem': {'default': 'Split RAW/JPEG'},
+                'NSServices': [{'NSMenuItem': {'default': 'Split RAW-JPEG'},
                                 'NSMessage': 'runWorkflowAsService',
+                                'NSIconName': 'NSActionTemplate',
+                                'NSBackgroundColorName': 'background',
                                 'NSSendFileTypes': ['public.folder'],
                                 'NSRequiredContext': {'NSApplicationIdentifier': 'com.apple.finder'}}]}
         (contents / 'Info.plist').write_bytes(plistlib.dumps(info))
