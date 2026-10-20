@@ -23,72 +23,30 @@ least one folder or file failed. Logs go to `~/Library/Logs/image_split.log`,
 with console logging as a fallback. `--notify` enables a macOS completion
 notification; notification display depends on macOS settings.
 
-## Build the macOS installer prototype
+## Unsigned macOS installer
 
-The installer sources are included; a downloadable release is not built yet.
-Build on macOS using a **trusted, relocatable, standalone Python 3.10+ runtime**
-containing `bin/python3` and its standard library. A virtual environment or a
-symlink to system Python is not a standalone runtime. Use an upstream macOS
-standalone distribution, verify its published checksum/signature, retain its
-license notices, and select an architecture and minimum macOS version matching
-your release. The builder does not download or authenticate runtime artifacts.
-Publish separate Apple Silicon and Intel packages unless the runtime is universal.
+ImageSplit bundles Python and installs the Finder Quick Action **Split RAW-JPEG**.
 
-```sh
-python3 packaging/build_installer.py --runtime /path/to/verified/standalone/python
-```
+See [installation and manual approval instructions](docs/macos-install.md).
 
-The builder copies and smoke-tests the runtime after relocation, generates the
-Automator workflow, and produces `dist/ImageSplit.pkg`. It installs:
+The installer is unsigned and not notarized. Keep macOS security protections enabled.
 
-- `/Library/Application Support/ImageSplit/image_split.py`
-- `/Library/Application Support/ImageSplit/runtime/`
-- `/Library/Services/Split RAW-JPEG.workflow`
+Candidate 0.1.4 was reported working in a standard account on Apple Silicon, macOS 15.7.4. A fresh-download test on another Apple Silicon Mac remains outstanding. Intel support and the minimum supported macOS version are not yet validated. No public release has been published.
 
-The package requires administrator approval and makes the Quick Action available
-to all users. It bundles its own Python and does not install a system Python.
-In Finder, select one or more folders and choose **Quick Actions → Split RAW/JPEG**.
-If needed, enable it in macOS Settings under Extensions / Finder or Services
-(the location varies by macOS version), then reopen Finder. macOS may request
-access to protected folders or external drives; grant access only as needed.
+### Build an Apple Silicon candidate
 
-### Required macOS release checks
+Use a trusted, checksum-verified, relocatable standalone Python 3.10+
+runtime and retain its license notices. Do not use a virtual environment
+or a symlink to system Python. The builder does not authenticate the runtime.
 
-The Linux development environment can validate sorting but cannot validate
-`pkgbuild`, Automator registration, macOS file flags, permissions, or Gatekeeper.
-On a clean Mac for each supported architecture and macOS version:
+    python3 packaging/build_installer.py --runtime /path/to/verified/python --arch arm64 --version 0.1.4
 
-1. Build and install the package without relying on a preinstalled Python.
-2. Select folders with spaces, apostrophes, and Unicode names, including multiple
-   selections. Confirm RAW/JPEG contents, collision handling, and repeat runs.
-3. Try locked images, a read-only folder, and external-drive photos. Verify errors
-   appear in the log and a completion notification reports failures.
-4. Reinstall/upgrade and confirm the Quick Action still works after logging out.
+Omit --sign for unsigned distribution. The builder checks the interpreter
+architecture and smoke-tests the relocated runtime. It writes a package,
+SHA-256 checksum, and JSON build record into dist/.
 
-For public distribution, sign bundled executable code as required by Apple's
-current notarization rules, then build with
-`--sign "Developer ID Installer: Your Name (TEAMID)"`. Submit the resulting package
-with `xcrun notarytool submit dist/ImageSplit.pkg --keychain-profile PROFILE --wait`,
-staple it using `xcrun stapler staple dist/ImageSplit.pkg`, and validate with
-`xcrun stapler validate` and `spctl --assess --type install --verbose` on the package.
-An installer signature alone does not sign its bundled runtime. Keep signing
-credentials out of this repository. Upload the validated package and SHA-256
-checksum to GitHub Releases, then link that release from the website.
+Installation requires administrator authorization. Each user enables
+Split RAW-JPEG through Finder > Quick Actions > Customize.
 
-To uninstall, remove the three ImageSplit paths listed above using administrator
-permissions. Your photos and per-user log files remain untouched.
-
-## Enable the Finder Quick Action
-
-After installing ImageSplit:
-
-1. Right-click a folder in Finder.
-2. Choose Quick Actions → Customize.
-3. Enable Split RAW-JPEG.
-
-Select one or more folders, then choose
-Quick Actions → Split RAW-JPEG to sort their images.
-
-The current installer has been tested on an Apple Silicon Mac
-running macOS 15.7.4. It is an unsigned prototype; signing,
-notarization, and testing on another Mac remain outstanding.
+Intel builds require a separately verified x86_64 runtime and --arch x86_64.
+They must be tested on an Intel Mac before claiming Intel support.
